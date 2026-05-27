@@ -222,7 +222,7 @@ task.spawn(function()
 end)
 
 GuiLibrary = pload("GuiLibrary.lua", true, true)
-VWFunctions = pload("Libraries/VoidwareFunctions.lua", true, true)
+VWFunctions = pload("Libraries/voidwarefunctions.lua", true, true)
 
 GuiLibrary.SelfDestructEvent.Event:Connect(function() VWFunctions.SelfDestructEvent:Fire() end)
 
