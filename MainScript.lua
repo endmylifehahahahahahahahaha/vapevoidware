@@ -1,4 +1,4 @@
-﻿--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.
+--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.
 repeat task.wait() until game:IsLoaded()
 local GuiLibrary
 local VWFunctions
@@ -160,6 +160,8 @@ local function vapeGithubRequest(scripturl)
 			error(res)
 		end
 		if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
+		-- Strip UTF-8 BOM (EF BB BF) that GitHub CDN may prepend to raw responses
+		if res and res:sub(1, 3) == "\239\187\191" then res = res:sub(4) end
 		writefile("vape/"..scripturl, res)
 	end
 	return readfile("vape/"..scripturl)

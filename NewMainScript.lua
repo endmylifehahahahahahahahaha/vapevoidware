@@ -1,4 +1,4 @@
-﻿repeat task.wait() until game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
 shared.oldgetcustomasset = shared.oldgetcustomasset or getcustomasset
 local smooth = not game:IsLoaded()
 repeat task.wait() until game:IsLoaded()
@@ -635,6 +635,8 @@ local function vapeGithubRequest(scripturl, isImportant)
         end
         warn(baseDirectory..scripturl, res)
     end
+    -- Strip UTF-8 BOM (EF BB BF) that GitHub CDN may prepend to raw responses
+    if res and res:sub(1, 3) == "\239\187\191" then res = res:sub(4) end
     if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
     return res
 end
