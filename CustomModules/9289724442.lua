@@ -1,4 +1,5 @@
-﻿--[[ 
+﻿-- Game: BedWars - Newer Version (Place ID: 9289724442)
+--[[ 
 	Credits
 	Infinite Yield - Blink
 	DevForum - lots of rotation math because I hate it

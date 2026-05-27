@@ -1,3 +1,4 @@
+﻿-- Game: BedWars - Newer Version Alt (Place ID: 11640391378)
 --[[ 
 	Credits
 	Infinite Yield - Blink (backtrack), Freecam and SpinBot (spin / fling)

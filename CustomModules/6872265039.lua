@@ -1,4 +1,5 @@
-﻿--[[ 
+﻿-- Game: BedWars - Lobby (Place ID: 6872265039)
+--[[ 
 	Credits
 	Infinite Yield - Blink
 	Please notify me if you need credits

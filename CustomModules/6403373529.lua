@@ -1,4 +1,5 @@
-﻿-- Credits to Inf Yield & all the other scripts that helped me make bypasses
+﻿-- Game: Generic Combat Module (Place ID: 6403373529)
+-- Credits to Inf Yield & all the other scripts that helped me make bypasses
 local GuiLibrary = shared.GuiLibrary
 local players = game:GetService("Players")
 local textservice = game:GetService("TextService")

@@ -1,4 +1,5 @@
-﻿-- Credits to Inf Yield & all the other scripts that helped me make bypasses
+﻿-- Game: BedWars Royale Alt (Place ID: 9903116309)
+-- Credits to Inf Yield & all the other scripts that helped me make bypasses
 local GuiLibrary = shared.GuiLibrary
 local players = game:GetService("Players")
 local textservice = game:GetService("TextService")

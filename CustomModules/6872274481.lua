@@ -1,4 +1,5 @@
-﻿local GuiLibrary = shared.GuiLibrary
+﻿-- Game: BedWars - Main Game (Place ID: 6872274481)
+local GuiLibrary = shared.GuiLibrary
 local VoidwareFunctions = {WhitelistLoaded = false, WhitelistRefreshEvent = Instance.new("BindableEvent"), WhitelistSucceeded = false, WhitelistLoadTime = tick()}
 local VoidwareLibraries = {}
 local startTime = tick()
@@ -15403,6 +15404,715 @@ run(function()
 		end,
 		List = options
 	})
+end)
+
+-- ============================================================
+-- NEW FEATURES: Water Ambient, Damage Affects, Custom Tags,
+--               VelocityPlus, Visualizer, Velocity
+-- ============================================================
+
+run(function()
+	local WaterAmbient
+	local WaterColor
+	local waterY = 0
+
+	local function findLowestBlock()
+		local lowest = 99999
+		local params = RaycastParams.new()
+		params.FilterType = Enum.RaycastFilterType.Exclude
+		params.FilterDescendantsInstances = {lplr.Character, workspace.CurrentCamera}
+
+		for _, v in collectionService:GetTagged('block') do
+			if v and v.Position then
+				local ray = workspace:Raycast(v.Position + Vector3.new(0, 800, 0), Vector3.new(0, -1000, 0), params)
+				if ray and ray.Position.Y < lowest then
+					lowest = ray.Position.Y
+				end
+			end
+		end
+
+		if lowest == 99999 then
+			if entitylib.isAlive and entitylib.character and entitylib.character.RootPart then
+				local pos = entitylib.character.RootPart.Position
+				local ray = workspace:Raycast(pos, Vector3.new(0, -1000, 0), params)
+				if ray then
+					return ray.Position.Y - 7
+				end
+			end
+			return -20
+		end
+
+		return math.max(lowest - 7, -20)
+	end
+
+	WaterAmbient = vape.Categories.World:CreateModule({
+		Name = 'Water Ambient1',
+		Tooltip = 'Fills the map with a decorative water layer.',
+		Function = function(callback)
+			local terrain = workspace:FindFirstChildOfClass('Terrain')
+			if callback then
+				waterY = findLowestBlock()
+
+				terrain:FillBlock(
+					CFrame.new(0, waterY, 0),
+					Vector3.new(5000, 0.01, 5000),
+					Enum.Material.Water
+				)
+				terrain.WaterColor = Color3.fromHSV(WaterColor.Hue, WaterColor.Sat, WaterColor.Val)
+				terrain.WaterTransparency = 0.25
+				terrain.WaterReflectance = 0.7
+				terrain.WaterWaveSize = 0.13
+				terrain.WaterWaveSpeed = 8
+
+				if entitylib.isAlive then
+					entitylib.character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+				end
+
+				WaterAmbient:Clean(entitylib.Events.LocalAdded:Connect(function(char)
+					char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+				end))
+			else
+				terrain:FillBlock(
+					CFrame.new(0, waterY, 0),
+					Vector3.new(5000, 0.01, 5000),
+					Enum.Material.Air
+				)
+				waterY = 0
+				if entitylib.isAlive then
+					entitylib.character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
+				end
+			end
+		end
+	})
+
+	WaterColor = WaterAmbient:CreateColorSlider({
+		Name = 'Water Color',
+		Tooltip = 'Color of the water.',
+		Function = function(h, s, v)
+			WaterColor.Hue = h
+			WaterColor.Sat = s
+			WaterColor.Val = v
+			if WaterAmbient.Enabled then
+				workspace:FindFirstChildOfClass('Terrain').WaterColor = Color3.fromHSV(h, s, v)
+			end
+		end
+	})
+end)
+
+run(function()
+	local DamageAffect = {Enabled = false}
+	local Color
+	local connection
+	local Fonts
+	local customMSG
+	local DamageMessages = {
+		'Pow!', 'Pop!', 'Hit!', 'Smack!', 'Bang!', 'Boom!', 'Whoop!', 'Damage!',
+		'-9e9!', 'Whack!', 'Crash!', 'Slam!', 'Zap!', 'Snap!', 'Thump!', 'Ouch!',
+		'Crack!', 'Bam!', 'Clap!', 'Blitz!', 'Crunch!', 'Shatter!', 'Blast!',
+		'Womp!', 'Thunk!', 'Catware on top ong :pray:', 'Volt exe on top',
+		'Rattle!', 'Kaboom!', 'Wack!', 'Boomer!', 'Slammer!', 'Powee!', 'Zappp!',
+		'Thunker!', 'Rippler!', 'Bap!', 'Bomp!', 'Sock!', 'Chop!', 'Sting!',
+		'Slice!', 'Swipe!', 'Punch!', 'Tonk!', 'Bonk!', 'Jolt!', 'Spike!',
+		'Pierce!', 'Crush!', 'Bruise!', 'Ding!', 'Clang!', 'Crashhh!', 'Kablam!',
+		'Catware paid fire', 'catware private omg wow'
+	}
+
+	local RGBColors = {
+		Color3.fromRGB(245, 69, 69),
+		Color3.fromRGB(254, 105, 30),
+		Color3.fromRGB(255, 138, 5),
+		Color3.fromRGB(255, 162, 3),
+		Color3.fromRGB(245, 189, 37)
+	}
+
+	local function randomizer(tbl)
+		if not typeof(tbl) == "table" then return end
+		local index = math.random(1, #tbl)
+		local value = tbl[index]
+		return value, index
+	end
+	local font = 'Arial'
+
+	DamageAffect = vape.Categories.Render:CreateModule({
+		Name = "DamageAffects",
+		Function = function(call)
+			if call then
+				DamageAffect:Clean(workspace.DescendantAdded:Connect(function(part)
+					if part.Name == "DamageIndicatorPart" and part:IsA("BasePart") then
+						for i, v in part:GetDescendants() do
+							if v:IsA("TextLabel") then
+								local txt = randomizer(DamageMessages)
+								local clr = randomizer(RGBColors)
+								if customMSG.Enabled then
+									v.Text = txt
+								end
+								if Color.Enabled then
+									v.TextColor3 = clr
+								end
+								v.FontFace = font
+							end
+						end
+					end
+				end))
+			end
+		end,
+		Tooltip = "Customizes Damage Affects"
+	})
+	customMSG = DamageAffect:CreateToggle({
+		Name = "Custom Messages",
+		Default = true
+	})
+	Color = DamageAffect:CreateToggle({
+		Name = "Custom Colors",
+		Default = true
+	})
+	Fonts = DamageAffect:CreateFont({
+		Name = 'Font',
+		Function = function(val)
+			font = val
+		end
+	})
+end)
+
+run(function()
+	local CustomTags
+	local Color
+	local TAG
+	local old, old2
+	local tagConnections = {}
+	local tagRenderConn
+	local tagGuiConn
+
+	local function Color3ToHex(r, g, b)
+		return string.lower(string.format("#%02X%02X%02X", r, g, b))
+	end
+
+	local function CompleteTagEffect()
+		if not lplr:FindFirstChild("Tags") then return end
+		local tagObj = lplr.Tags:FindFirstChild("0")
+		if not tagObj then return end
+
+		if not old then
+			old = tagObj.Value
+			old2 = tagObj:GetAttribute("Text")
+		end
+
+		local color = Color3.fromHSV(Color.Hue, Color.Sat, Color.Value)
+		local R = math.floor(color.R * 255)
+		local G = math.floor(color.G * 255)
+		local B = math.floor(color.B * 255)
+
+		tagObj.Value = string.format("<font color='rgb(%d,%d,%d)'>[%s]</font>", R, G, B, TAG.Value)
+		tagObj:SetAttribute("Text", TAG.Value)
+		lplr:SetAttribute("ClanTag", TAG.Value)
+
+		if tagRenderConn then tagRenderConn:Disconnect() tagRenderConn = nil end
+		if tagGuiConn then tagGuiConn:Disconnect() tagGuiConn = nil end
+
+		tagGuiConn = lplr.PlayerGui.ChildAdded:Connect(function(child)
+			if child.Name ~= "TabListScreenGui" or not child:IsA("ScreenGui") then return end
+			tagRenderConn = runService.RenderStepped:Connect(function()
+				local nameToFind = (lplr.DisplayName == "" or lplr.DisplayName == lplr.Name) and lplr.Name or lplr.DisplayName
+				for _, v in ipairs(child:GetDescendants()) do
+					if v:IsA("TextLabel") and string.find(string.lower(v.Text), string.lower(nameToFind)) then
+						v.Text = string.format('<font transparency="0.3" color="%s">[%s]</font> %s', Color3ToHex(R, G, B), TAG.Value, nameToFind)
+					end
+				end
+			end)
+		end)
+	end
+
+	local function RemoveTagEffect()
+		if tagRenderConn then tagRenderConn:Disconnect() tagRenderConn = nil end
+		if tagGuiConn then tagGuiConn:Disconnect() tagGuiConn = nil end
+
+		if lplr:FindFirstChild("Tags") then
+			local tagObj = lplr.Tags:FindFirstChild("0")
+			if tagObj then
+				if old then tagObj.Value = old end
+				if old2 then tagObj:SetAttribute("Text", old2) end
+			end
+		end
+
+		if lplr:GetAttribute("ClanTag") then
+			lplr:SetAttribute("ClanTag", old)
+		end
+
+		old = nil
+		old2 = nil
+	end
+
+	CustomTags = vape.Categories.Render:CreateModule({
+		Name = "CustomTags",
+		Tooltip = "Client-Sided visual custom clan tag on-chat",
+		Function = function(callback)
+			if callback then
+				CompleteTagEffect()
+			else
+				RemoveTagEffect()
+			end
+		end
+	})
+
+	Color = CustomTags:CreateColorSlider({
+		Name = 'Color',
+		Function = function()
+			if CustomTags.Enabled then
+				CompleteTagEffect()
+			end
+		end
+	})
+
+	TAG = CustomTags:CreateTextBox({
+		Name = 'Tag',
+		Default = "Catware",
+		Function = function()
+			if CustomTags.Enabled then
+				CompleteTagEffect()
+			end
+		end
+	})
+end)
+
+run(function()
+	local VelocityPlus
+	local Mode
+	local Chance
+	local TargetCheck
+	local rand = Random.new()
+	local old = nil
+
+	local function rotateY(v, deg)
+		local r = math.rad(deg)
+		return Vector3.new(
+			v.X * math.cos(r) - v.Z * math.sin(r),
+			0,
+			v.X * math.sin(r) + v.Z * math.cos(r)
+		)
+	end
+
+	VelocityPlus = vape.Categories.Combat:CreateModule({
+		Name = 'VelocityPlus',
+		Tooltip = 'Redirects knockback you receive in a chosen direction.',
+		Function = function(callback)
+			if callback then
+				old = bedwars.KnockbackUtil.applyKnockback
+				bedwars.KnockbackUtil.applyKnockback = function(root, mass, dir, knockback, ...)
+					if rand:NextNumber(0, 100) > Chance.Value then
+						return old(root, mass, dir, knockback, ...)
+					end
+					if TargetCheck.Enabled and not entitylib.EntityPosition({
+						Range = 50, Part = 'RootPart', Players = true
+					}) then
+						return old(root, mass, dir, knockback, ...)
+					end
+					local victimPos = root.Position
+					local victimFlat = Vector3.new(victimPos.X, 0, victimPos.Z)
+					local awayVec = victimFlat - Vector3.new(dir.X, 0, dir.Z)
+					if awayVec.Magnitude < 0.001 then
+						return old(root, mass, dir, knockback, ...)
+					end
+					awayVec = awayVec.Unit
+					local chosen = Mode.Value
+					if chosen == 'Random' then
+						chosen = ({'Left', 'Right', 'Pull'})[rand:NextInteger(1, 3)]
+					end
+					local desiredAway
+					if chosen == 'Left' then
+						desiredAway = rotateY(awayVec, 90)
+					elseif chosen == 'Right' then
+						desiredAway = rotateY(awayVec, -90)
+					elseif chosen == 'Pull' then
+						desiredAway = -awayVec
+					else
+						desiredAway = awayVec
+					end
+					local fakeAttacker = Vector3.new(
+						victimPos.X - desiredAway.X * 100,
+						dir.Y,
+						victimPos.Z - desiredAway.Z * 100
+					)
+					return old(root, mass, fakeAttacker, knockback, ...)
+				end
+			else
+				if old then
+					bedwars.KnockbackUtil.applyKnockback = old
+					old = nil
+				end
+			end
+		end
+	})
+
+	Mode = VelocityPlus:CreateDropdown({
+		Name = 'Direction',
+		List = {'Left', 'Right', 'Pull', 'Random'},
+		Default = 'Random',
+		Tooltip = 'Left/Right: deflect sideways 90\nPull: go past the attacker\nRandom: pick one each hit'
+	})
+	Chance = VelocityPlus:CreateSlider({
+		Name = 'Chance',
+		Min = 0,
+		Max = 100,
+		Default = 100,
+		Suffix = '%',
+		Tooltip = 'Probability the redirect applies per knockback event'
+	})
+	TargetCheck = VelocityPlus:CreateToggle({
+		Name = 'Only when targeting',
+		Tooltip = 'Only redirects knockback when an enemy is within 50 studs'
+	})
+end)
+
+run(function()
+	local Visualizer
+	local VisualizeServerPos
+	local ShowTargetRange
+
+	local ghostPart = nil
+	local ghostConn = nil
+
+	local function buildGhost()
+		if ghostPart then return end
+		ghostPart = Instance.new('Part')
+		ghostPart.Name = 'ServerPositionGhost'
+		ghostPart.Anchored = true
+		ghostPart.CanCollide = false
+		ghostPart.CanQuery = false
+		ghostPart.CastShadow = false
+		ghostPart.Size = Vector3.new(2, 5, 2)
+		ghostPart.Material = Enum.Material.Neon
+		ghostPart.Color = Color3.fromRGB(0, 200, 255)
+		ghostPart.Transparency = 0.4
+		ghostPart.Parent = gameCamera
+
+		local billboard = Instance.new('BillboardGui')
+		billboard.Size = UDim2.new(0, 140, 0, 40)
+		billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = ghostPart
+
+		local label = Instance.new('TextLabel')
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.TextColor3 = Color3.fromRGB(0, 200, 255)
+		label.TextStrokeTransparency = 0
+		label.TextScaled = true
+		label.Text = 'Server Pos'
+		label.Font = Enum.Font.GothamBold
+		label.Parent = billboard
+
+		local posHistory = {}
+		local DELAY_FRAMES = 6
+
+		ghostConn = runService.PostSimulation:Connect(function()
+			if not entitylib.isAlive or not ghostPart then return end
+			local rootPart = entitylib.character.RootPart
+			if not rootPart then return end
+			table.insert(posHistory, rootPart.Position)
+			if #posHistory > DELAY_FRAMES then table.remove(posHistory, 1) end
+			local serverPos = posHistory[1] or rootPart.Position
+			ghostPart.Position = serverPos
+			label.Text = 'Server Pos\n' .. math.round((rootPart.Position - serverPos).Magnitude * 100) / 100 .. ' studs'
+		end)
+	end
+
+	local function destroyGhost()
+		if ghostConn then ghostConn:Disconnect() ghostConn = nil end
+		if ghostPart then ghostPart:Destroy() ghostPart = nil end
+	end
+
+	local rangeCircles = {}
+	local rangeConn = nil
+
+	local function getEnemyReach(ent)
+		local inv = store.inventories[ent.Player]
+		if inv then
+			for _, item in (inv.items or {}) do
+				local meta = bedwars.ItemMeta[item.itemType]
+				if meta and meta.sword and meta.sword.attackRange then
+					return meta.sword.attackRange
+				end
+			end
+		end
+		return 14.4
+	end
+
+	local function buildRangeCircle(ent)
+		if rangeCircles[ent] then return end
+		local reach = getEnemyReach(ent)
+		local p = Instance.new('Part')
+		p.Anchored = true
+		p.CanCollide = false
+		p.CanQuery = false
+		p.CastShadow = false
+		p.Shape = Enum.PartType.Cylinder
+		p.Size = Vector3.new(0.05, reach * 2, reach * 2)
+		p.Material = Enum.Material.Neon
+		p.Color = Color3.fromRGB(255, 60, 60)
+		p.Transparency = 0.55
+		p.Parent = gameCamera
+		local bb = Instance.new('BillboardGui')
+		bb.Size = UDim2.new(0, 120, 0, 30)
+		bb.StudsOffset = Vector3.new(0, 4, 0)
+		bb.AlwaysOnTop = true
+		bb.Parent = p
+		local lbl = Instance.new('TextLabel')
+		lbl.Size = UDim2.new(1, 0, 1, 0)
+		lbl.BackgroundTransparency = 1
+		lbl.TextColor3 = Color3.fromRGB(255, 60, 60)
+		lbl.TextStrokeTransparency = 0
+		lbl.TextScaled = true
+		lbl.Font = Enum.Font.GothamBold
+		lbl.Text = ''
+		lbl.Parent = bb
+		rangeCircles[ent] = {part = p, label = lbl, reach = reach}
+	end
+
+	local function destroyRangeCircle(ent)
+		local data = rangeCircles[ent]
+		if data then
+			data.part:Destroy()
+			rangeCircles[ent] = nil
+		end
+	end
+
+	local function buildRangeVisuals()
+		if rangeConn then return end
+		rangeConn = runService.PostSimulation:Connect(function()
+			if not entitylib.isAlive then return end
+			local myRoot = entitylib.character.RootPart
+			if not myRoot then return end
+			local myPos = myRoot.Position
+			local seen = {}
+			for _, ent in entitylib.List do
+				if not ent.Targetable then continue end
+				if not ent.RootPart or not ent.RootPart.Parent then continue end
+				if (ent.RootPart.Position - myPos).Magnitude > 50 then
+					destroyRangeCircle(ent)
+					continue
+				end
+				seen[ent] = true
+				buildRangeCircle(ent)
+				local data = rangeCircles[ent]
+				if not data then continue end
+				local reach = getEnemyReach(ent)
+				if reach ~= data.reach then
+					data.part.Size = Vector3.new(0.05, reach * 2, reach * 2)
+					data.reach = reach
+				end
+				local entPos = ent.RootPart.Position
+				local footY = entPos.Y - (ent.HipHeight or 2.5)
+				data.part.CFrame = CFrame.new(Vector3.new(entPos.X, footY, entPos.Z)) * CFrame.Angles(0, 0, math.pi / 2)
+				local dist = (myPos - entPos).Magnitude
+				local inRange = dist <= reach
+				local col = inRange and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 60, 60)
+				data.part.Color = col
+				data.label.TextColor3 = col
+				data.label.Text = math.round(dist * 10) / 10 .. ' / ' .. reach .. ' studs'
+			end
+			for ent in rangeCircles do
+				if not seen[ent] then destroyRangeCircle(ent) end
+			end
+		end)
+	end
+
+	local function destroyRangeVisuals()
+		if rangeConn then rangeConn:Disconnect() rangeConn = nil end
+		for ent in rangeCircles do destroyRangeCircle(ent) end
+		table.clear(rangeCircles)
+	end
+
+	Visualizer = vape.Categories.Utility:CreateModule({
+		Name = 'Visualizer',
+		Tooltip = 'Debug visualization tools',
+		Function = function(callback)
+			if callback then
+				if VisualizeServerPos and VisualizeServerPos.Enabled then buildGhost() end
+				if ShowTargetRange and ShowTargetRange.Enabled then buildRangeVisuals() end
+			else
+				destroyGhost()
+				destroyRangeVisuals()
+			end
+		end
+	})
+
+	VisualizeServerPos = Visualizer:CreateToggle({
+		Name = 'Visualize Server Position',
+		Tooltip = 'Shows a cyan box at your approximate server-side position\n(~100ms behind your real position, matching the replication window).',
+		Function = function(callback)
+			if callback then buildGhost() else destroyGhost() end
+		end
+	})
+
+	ShowTargetRange = Visualizer:CreateToggle({
+		Name = 'Show Target Range',
+		Tooltip = 'Shows a dynamic reach circle around each nearby enemy.\nGreen = they can reach you  Red = out of their reach.\nLabel shows your distance vs their sword reach.',
+		Function = function(callback)
+			if callback then buildRangeVisuals() else destroyRangeVisuals() end
+		end
+	})
+end)
+
+run(function()
+	local Velocity
+	local VelocityMode
+	local Horizontal
+	local Vertical
+	local Chance
+	local TargetCheck
+	local AirDelayMin
+	local AirDelayMax
+	local GroundDelayMin
+	local GroundDelayMax
+	local rand, old = Random.new()
+
+	local function updateSliderVisibility()
+		local mode = VelocityMode and VelocityMode.Value or 'Normal'
+		local isNormal  = mode == 'Normal'
+		local isDelayed = mode == 'Delayed'
+
+		if Horizontal     then Horizontal.Object.Visible     = isNormal  end
+		if Vertical       then Vertical.Object.Visible       = isNormal  end
+		if AirDelayMin    then AirDelayMin.Object.Visible    = isDelayed end
+		if AirDelayMax    then AirDelayMax.Object.Visible    = isDelayed end
+		if GroundDelayMin then GroundDelayMin.Object.Visible = isDelayed end
+		if GroundDelayMax then GroundDelayMax.Object.Visible = isDelayed end
+	end
+
+	Velocity = vape.Categories.Combat:CreateModule({
+		Name = 'Velocity',
+		Disabled = not canDebug,
+		Tooltip = 'Reduces or manipulates knockback taken.\nNormal: reduce horizontal/vertical %\nDelayed: delay knockback application\nJumpReset: auto-jump on hit to cancel vertical KB',
+		Function = function(callback)
+			if callback then
+				local mode = VelocityMode and VelocityMode.Value or 'Normal'
+
+				if mode == 'Normal' then
+					old = bedwars.KnockbackUtil.applyKnockback
+					bedwars.KnockbackUtil.applyKnockback = function(root, mass, dir, knockback, ...)
+						if rand:NextNumber(0, 100) > Chance.Value then return old(root, mass, dir, knockback, ...) end
+						local check = (not TargetCheck.Enabled) or entitylib.EntityPosition({
+							Range = 50, Part = 'RootPart', Players = true
+						})
+						if check then
+							knockback = knockback or {}
+							if Horizontal.Value == 0 and Vertical.Value == 0 then return end
+							knockback.horizontal = (knockback.horizontal or 1) * (Horizontal.Value / 100)
+							knockback.vertical   = (knockback.vertical   or 1) * (Vertical.Value   / 100)
+						end
+						return old(root, mass, dir, knockback, ...)
+					end
+
+				elseif mode == 'Delayed' then
+					old = bedwars.KnockbackUtil.applyKnockback
+					bedwars.KnockbackUtil.applyKnockback = function(root, mass, dir, knockback, ...)
+						if rand:NextNumber(0, 100) > Chance.Value then return old(root, mass, dir, knockback, ...) end
+						local check = (not TargetCheck.Enabled) or entitylib.EntityPosition({
+							Range = 50, Part = 'RootPart', Players = true
+						})
+						if not check then return old(root, mass, dir, knockback, ...) end
+
+						local onGround = entitylib.isAlive
+							and entitylib.character.Humanoid
+							and entitylib.character.Humanoid.FloorMaterial ~= Enum.Material.Air
+
+						local minMs = onGround and GroundDelayMin.Value or AirDelayMin.Value
+						local maxMs = onGround and GroundDelayMax.Value or AirDelayMax.Value
+						local delayMs = rand:NextInteger(minMs, maxMs)
+
+						local capturedRoot      = root
+						local capturedMass      = mass
+						local capturedDir       = dir
+						local capturedKnockback = knockback
+						local capturedRest      = {...}
+						task.delay(delayMs / 1000, function()
+							if old then
+								old(capturedRoot, capturedMass, capturedDir, capturedKnockback, table.unpack(capturedRest))
+							end
+						end)
+					end
+
+				elseif mode == 'JumpReset' then
+					old = bedwars.KnockbackUtil.applyKnockback
+					bedwars.KnockbackUtil.applyKnockback = function(root, mass, dir, knockback, ...)
+						if rand:NextNumber(0, 100) > Chance.Value then
+							return old(root, mass, dir, knockback, ...)
+						end
+						local check = (not TargetCheck.Enabled) or entitylib.EntityPosition({
+							Range = 50, Part = 'RootPart', Players = true
+						})
+						if check and entitylib.isAlive and root == entitylib.character.RootPart then
+							local hum = entitylib.character.Humanoid
+							if hum and hum.FloorMaterial ~= Enum.Material.Air then
+								hum.Jump = true
+							end
+						end
+						return old(root, mass, dir, knockback, ...)
+					end
+				end
+
+			else
+				if old then
+					bedwars.KnockbackUtil.applyKnockback = old
+					old = nil
+				end
+			end
+		end
+	})
+
+	VelocityMode = Velocity:CreateDropdown({
+		Name = 'Mode',
+		List = {'Normal', 'Delayed', 'JumpReset'},
+		Default = 'Normal',
+		Tooltip = 'Normal: reduce KB %\nDelayed: delay KB by random ms\nJumpReset: auto-jump on hit',
+		Function = function()
+			updateSliderVisibility()
+			if Velocity.Enabled then
+				Velocity:Toggle()
+				Velocity:Toggle()
+			end
+		end
+	})
+
+	Horizontal = Velocity:CreateSlider({
+		Name = 'Horizontal',
+		Min = 0, Max = 100, Default = 0, Suffix = '%'
+	})
+	Vertical = Velocity:CreateSlider({
+		Name = 'Vertical',
+		Min = 0, Max = 100, Default = 0, Suffix = '%'
+	})
+
+	AirDelayMin = Velocity:CreateSlider({
+		Name = 'Air Delay Min',
+		Min = 0, Max = 1000, Default = 125, Suffix = 'ms',
+		Tooltip = 'Minimum knockback delay when airborne',
+		Visible = false
+	})
+	AirDelayMax = Velocity:CreateSlider({
+		Name = 'Air Delay Max',
+		Min = 0, Max = 1000, Default = 175, Suffix = 'ms',
+		Tooltip = 'Maximum knockback delay when airborne',
+		Visible = false
+	})
+	GroundDelayMin = Velocity:CreateSlider({
+		Name = 'Ground Delay Min',
+		Min = 0, Max = 1000, Default = 250, Suffix = 'ms',
+		Tooltip = 'Minimum knockback delay when on the ground',
+		Visible = false
+	})
+	GroundDelayMax = Velocity:CreateSlider({
+		Name = 'Ground Delay Max',
+		Min = 0, Max = 1000, Default = 500, Suffix = 'ms',
+		Tooltip = 'Maximum knockback delay when on the ground',
+		Visible = false
+	})
+
+	Chance = Velocity:CreateSlider({
+		Name = 'Chance',
+		Min = 0, Max = 100, Default = 100, Suffix = '%'
+	})
+	TargetCheck = Velocity:CreateToggle({Name = 'Only when targeting'})
 end)
 
 warningNotification('Voidware ' .. void.version, 'Loaded in ' .. string.format('%.1f', void.round(tick() - void.load))..'s. Logged in as ' .. lplr.Name .. '.', 7)

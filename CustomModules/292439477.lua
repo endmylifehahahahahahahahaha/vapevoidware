@@ -1,4 +1,5 @@
-﻿--[[ 
+﻿-- Game: Phantom Forces (Place ID: 292439477)
+--[[ 
 	Credits
 	mickeydev - Bypass for the actor garbage (thanks exploit developers, very cool) - https://v3rmillion.net/showthread.php?tid=1195926
 ]]
