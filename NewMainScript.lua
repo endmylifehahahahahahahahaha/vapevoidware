@@ -594,7 +594,8 @@ local url = shared.RiseMode and "https://github.com/endmylifehahahahahahahahaha/
 local commit = "main"
 writefile(baseDirectory.."commithash2.txt", commit)
 shared.RiseMode = false
-commit = "7a624fca7a730a6f2eb6292999e0acbadc673fc1"
+-- Use main branch instead of hardcoded commit hash
+commit = "main"
 --[[if not shared.RiseMode then
     commit = "60143661ed276fb2600b1a5f09015ecce12ead82"
 else
