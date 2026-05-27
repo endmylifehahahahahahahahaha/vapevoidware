@@ -1,4 +1,4 @@
--- Credits to Inf Yield & all the other scripts that helped me make bypasses
+﻿-- Credits to Inf Yield & all the other scripts that helped me make bypasses
 local GuiLibrary = shared.GuiLibrary
 local players = game:GetService("Players")
 local textservice = game:GetService("TextService")
@@ -76,7 +76,7 @@ local function getcustomassetfunc(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/"..path:gsub("vape/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/"..path:gsub("vape/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)

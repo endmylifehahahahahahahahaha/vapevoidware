@@ -1,4 +1,4 @@
---[[ 
+﻿--[[ 
 	Credits
 	mickeydev - Bypass for the actor garbage (thanks exploit developers, very cool) - https://v3rmillion.net/showthread.php?tid=1195926
 ]]
@@ -82,7 +82,7 @@ local function GetURL(scripturl)
 		assert(betterisfile("vape/"..scripturl), "File not found : vape/"..scripturl)
 		return readfile("vape/"..scripturl)
 	else
-		local res = game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/"..scripturl, true)
+		local res = game:HttpGet("https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/"..scripturl, true)
 		assert(res ~= "404: Not Found", "File not found : vape/"..scripturl)
 		return res
 	end
@@ -219,7 +219,7 @@ local function getcustomassetfunc(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/"..path:gsub("vape/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/"..path:gsub("vape/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)

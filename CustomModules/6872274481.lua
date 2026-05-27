@@ -1,4 +1,4 @@
-local GuiLibrary = shared.GuiLibrary
+﻿local GuiLibrary = shared.GuiLibrary
 local VoidwareFunctions = {WhitelistLoaded = false, WhitelistRefreshEvent = Instance.new("BindableEvent"), WhitelistSucceeded = false, WhitelistLoadTime = tick()}
 local VoidwareLibraries = {}
 local startTime = tick()
@@ -9,7 +9,7 @@ local VoidwareWhitelistStore = {
 	Hash = "voidwaremoment",
 	BlacklistTable = {},
 	Tab = {},
-	Rank = "Standard",
+	Rank = "Standard", --// plesae change this horrible code oh my gosh bro, why do we even have this as is....
 	Priority = {
 		DEFAULT = 0,
 		STANDARD = 1,
@@ -9413,20 +9413,20 @@ task.spawn(function()
 		pcall(function()
 			if not isfile("vape/Profiles/bedwarsdata.txt") then 
 				local commit = "main"
-				for i,v in pairs(game:HttpGet("https://github.com/VapeVoidware/vapevoidware"):split("\n")) do 
+				for i,v in pairs(game:HttpGet("https://github.com/endmylifehahahahahahahahaha/vapevoidware"):split("\n")) do 
 					if v:find("commit") and v:find("fragment") then 
 						local str = v:split("/")[5]
 						commit = str:sub(0, str:find('"') - 1)
 						break
 					end
 				end
-				writefile("vape/Profiles/bedwarsdata.txt", game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/"..commit.."/CustomModules/bedwarsdata", true))
+				writefile("vape/Profiles/bedwarsdata.txt", game:HttpGet("https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/"..commit.."/CustomModules/bedwarsdata", true))
 			end
 			local olddata = readfile("vape/Profiles/bedwarsdata.txt")
 
 			repeat
 				local commit = "main"
-				for i,v in pairs(game:HttpGet("https://github.com/VapeVoidware/vapevoidware"):split("\n")) do 
+				for i,v in pairs(game:HttpGet("https://github.com/endmylifehahahahahahahahaha/vapevoidware"):split("\n")) do 
 					if v:find("commit") and v:find("fragment") then 
 						local str = v:split("/")[5]
 						commit = str:sub(0, str:find('"') - 1)
@@ -9434,7 +9434,7 @@ task.spawn(function()
 					end
 				end
 				
-				local newdata = game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/"..commit.."/CustomModules/bedwarsdata", true)
+				local newdata = game:HttpGet("https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/"..commit.."/CustomModules/bedwarsdata", true)
 				if newdata ~= olddata then 
 					rundata(game:GetService("HttpService"):JSONDecode(newdata), game:GetService("HttpService"):JSONDecode(olddata))
 					olddata = newdata
@@ -10469,7 +10469,7 @@ local function WinW(title, text, delay)
 	end)
 	return (suc and res)
 end
-
+--// disabled code from codebase # 27/05/2026 - this is horrible, recode this when needed to.
 --[[run(function()
 	local deb
 	local con
@@ -10539,7 +10539,7 @@ end
 	})
 end)--]]
 
---[[run(function() 
+run(function() 
 	local TeleportBed
 	local bedConnection
 	local client = require(game:GetService("ReplicatedStorage"):WaitForChild("TS"):WaitForChild("remotes")).default.Client
@@ -10639,7 +10639,7 @@ end)--]]
 		end,
 		List = {"DEFAULT"}
 	})
-end)--]]	
+end)
 
 --[[local WaterMark = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
 	Name = "WaterMark",
@@ -11179,7 +11179,7 @@ run(function()
 	Function = function(callback)
 		if callback then 
 			CustomTargetHud.Enabled = false 
-		        wait() --prevents breaking/not loading lol (yup, laziest way ever to do this.)
+		        wait()
 			CustomTargetHud.Enabled = true 
 			local Table = {
 				["_MainGui"] = Instance.new("ScreenGui");
@@ -11711,11 +11711,11 @@ run(function()
 	})
 end)
 
---[[for i,v in pairs(store.blocks) do
+for i,v in pairs(store.blocks) do
     local highlight = Instance.new("Highlight", store.blocks[i])
-end--]]
+end
 
---[[run(function()
+run(function()
 	local LuckyBlocksESP = {Enabled = false}
 	local EspTransparency = {Value = 0.5}
 	local espParts = {}
@@ -11738,10 +11738,10 @@ end--]]
 			end
 		end
 	})
-end)--]]
+end)
 
 local teleportService = game:GetService("TeleportService")
---[[run(function()
+run(function()
 	local StaffDetector = {}
 	local StaffDetectorMode = {Value = 'Lobby'}
 	local legitgamers = {}
@@ -11879,7 +11879,7 @@ local teleportService = game:GetService("TeleportService")
 		List = dumptable(staffactions, 1),
 		Function = function() end
 	})
-end)--]]
+end)
 
 run(function() 
 	local JoinQueue = {}
@@ -12648,7 +12648,7 @@ run(function()
     })
 end)
 
---[[run(function()
+run(function()
 	local ShellExploit = {}
 	local shells = {}
 	local function remove_esp(part)
@@ -12704,7 +12704,7 @@ end)
 			end
 		end
 	})
-end)--]]
+end)
 
 run(function()
 	local SpawnParts = {}
@@ -13397,7 +13397,7 @@ run(function()
     })
 end)
 
---[[local GuiLibrary = shared.GuiLibrary
+local GuiLibrary = shared.GuiLibrary
 run(function()
 	local ScytheDisabler = {}
 	ScytheDisabler = GuiLibrary.ObjectsThatCanBeSaved.VoidwareDevWindow.Api.CreateOptionsButton({
@@ -13427,9 +13427,9 @@ run(function()
 			end
 		end
 	})
-end)]]
+end)
 
---[[run(function()
+run(function()
 	local Disabler = {Enabled = false}
 	local ZephyrSpeed = {Value = 1}
 	local DisablerMode = {Value = "Scythe"}
@@ -13517,7 +13517,7 @@ end)]]
 			Disabler.ToggleButton(false)
 		end
 	})
-	--[[Float = Disabler.CreateToggle({
+	Float = Disabler.CreateToggle({
 		Name = "Float (EXPERIMENTAL)",
 		Default = true,
 		Function = function(callback)
@@ -13542,9 +13542,9 @@ end)]]
         Name = 'CreditsButtonInstance',
         Credits = 'Cat V5 (qwertyui)'
     })
-end)--]]
+end)
 
---[[run(function()
+run(function()
     local enchantexploit = {};
 	local enchantnum = 0
 	local et = 0
@@ -13583,9 +13583,9 @@ end)--]]
         Name = 'CreditsButtonInstance',
         Credits = 'Cat V5 (qwertyui)'
     })
-end)--]]
+end)
 
---[[run(function()
+run(function()
 	local MelodyExploit = {Enabled = false}
 
 	MelodyExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({ -- how does this work? idk honestly
@@ -13636,8 +13636,8 @@ end)--]]
         Name = 'CreditsButtonInstance',
         Credits = 'Cat V5 (qwertyui)'
     })
-end)--]]
---[[run(function()
+end)
+run(function()
 	local InstantEmeraldArmour = {}
 	InstantEmeraldArmour = GuiLibrary.ObjectsThatCanBeSaved.VoidwareWindow.Api.CreateOptionsButton({
 		Name = 'InstantEmeraldArmour',
@@ -13665,7 +13665,7 @@ end)--]]
         Name = 'CreditsButtonInstance',
         Credits = 'floppa'
     })
-end)--]]
+end)
 
 local function getItemDrop(drop)
 	if not isAlive(lplr, true) and not RenderStore.LocalPosition then 
@@ -14870,7 +14870,7 @@ run(function()
     })
 end)
 
---[[run(function()
+run(function()
 	local HannahExploit = {Enabled = false}
 	HannahExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = "HannahExploit",
@@ -14905,9 +14905,9 @@ end)
         Name = 'CreditsButtonInstance',
         Credits = 'CatV5'
     })
-end)--]]
+end)
 
---[[run(function() -- thank you SystemXVoid for letting me use this
+run(function() -- thank you SystemXVoid for letting me use this
     local enchantexploit = {};
     local enchantexploit = {}
 	local enchantnum = 0
@@ -14970,7 +14970,7 @@ end)--]]
         Name = 'CreditsButtonInstance',
         Credits = 'Render/CatV5'
     })
-end)--]]
+end)
 
 run(function()
 	local lplr = game:GetService("Players").LocalPlayer
@@ -15097,7 +15097,7 @@ run(function()
 
 	lplr_gui.ChildAdded:Connect(handle_new_ui)
 end)
---[[run(function()
+run(function()
 	local JellyFishExploit = {}
 	JellyFishExploit = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
 		Name = 'JellyFishExploit',
@@ -15116,9 +15116,9 @@ end)
 			end
 		end
 	})
-end)--]]
+end)
 
---[[run(function()
+run(function()
 	local FortunaExploit = {}
 	FortunaExploit = GuiLibrary.ObjectsThatCanBeSaved.VoidwareDevWindow.Api.CreateOptionsButton({
 		Name = 'test_fortuna_Exploit',
@@ -15178,9 +15178,9 @@ end)--]]
 			end
 		end
 	})
-end)--]]
+end)
 
---[[run(function()
+run(function()
 	local AutoUpgradeEra = {}
 	AutoUpgradeEra = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = 'AutoUpgradeEra',
@@ -15221,9 +15221,9 @@ end)--]]
         Name = 'CreditsButtonInstance',
         Credits = 'Aurora'
     })
-end)--]]
+end)
 
---[[run(function()
+run(function()
 	local TPHighJump = {Enabled = false} --- sup nebula :)
 
 	local function PerformHighJump()
@@ -15266,9 +15266,9 @@ end)--]]
 			TPHighJumpDistance.Value = value
 		end
 	})
-end)--]]
+end)
 
---[[run(function()
+run(function()
 	local insta = {Enabled = false}
 	insta = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = "EmberExploit",
@@ -15281,7 +15281,7 @@ end)--]]
 						game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.HellBladeRelease:FireServer({
 							["chargeTime"] = 0.999,
 							["player"] = game:GetService("Players").LocalPlayer,
-							["weapon"] =game:GetService("ReplicatedStorage").Inventories:FindFirstChild(lplr.Name.."infernal_saber"),
+							["weapon"] = game:GetService("ReplicatedStorage").Inventories:FindFirstChild(lplr.Name.."infernal_saber"),
 						})
 					until (not insta.Enabled)
 				end)
@@ -15289,8 +15289,30 @@ end)--]]
 		end, 
 		HoverText = "🔥ember"
 	})
-end)--]]
+end)
 
+run(function()
+	local insta = {Enabled = false}
+	insta = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "Slime Exploit"
+		Function = function(callback)
+			if callback then 
+				warningNotification("Slime Exploit", "Slime Chunc is required for this to work", 3)
+				task.spawn(function()
+					repeat
+						task.wait()
+						game:GetService("ReplicatedStorage").rbxts_include.node_module["@rbxts"].net.out._NetManaged.HellBladeRelease:FireServer({
+							["chargeTime"] = 0.001
+							["player"] = game:GetService("Players").LocalPlayer,
+							["weapon"] = game:Getservice("ReplicatedStorage").Inventories:FindFirstChild(lplr.Name.."Slime_Chunck"),
+						})
+											until (not insta.Enabled)
+				end)
+			end
+		end, 
+		HoverText = "Slime Exploit"
+	})
+end)
 run(function()
 	local Anime = {}
 	local Anime_table = {
@@ -15403,7 +15425,7 @@ end)--]]
 	pcall(function()
 		if shared.GuiLibrary.ObjectsThatCanBeSaved["Extra modeToggle"].Api.Enabled == true then
 			local suc, err = pcall(function()
-				loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/Libraries/ExtraModules.lua", true))()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/Libraries/ExtraModules.lua", true))()
 			end)
 			if err then if shared.VapeDeveloper then InfoNotification("ExtraModules", "Failure loading! Error: "..tostring(err)) end warn("[ExtraModules] Failure loading! Error: "..tostring(err)) end
 		end

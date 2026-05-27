@@ -1,4 +1,4 @@
-local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
+﻿local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
 local RenderLibraries = {}
 local RenderConnections = {}
 local players = game:GetService('Players')
@@ -105,7 +105,7 @@ end
     local coreinstalled = 0
     for i,v in next, ({'Universal.lua', 'MainScript.lua', 'NewMainScript.lua', 'GuiLibrary.lua'}) do 
         task.spawn(function()
-            local contents = game:HttpGet('https://raw.githubusercontent.com/Erchobg/vapevoidware/main/'..RenderFunctions:GithubHash()..v)
+            local contents = game:HttpGet('https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/'..RenderFunctions:GithubHash()..v)
             if contents ~= '404: Not Found' then 
                 contents = (tostring(contents:split('\n')[1]):find('Voidware Custom Vape Signed File') and contents or '-- Voidware Custom Vape Signed File\n'..contents)
                 if isfolder('vape') then 
@@ -118,7 +118,7 @@ end
     end
     for i,v in next, ({'6872274481.lua', '6872265039.lua'}) do 
         task.spawn(function()
-            local contents = game:HttpGet('https://raw.githubusercontent.com/Erchobg/vapevoidware/main/CustomModules/'..RenderFunctions:GithubHash()..v)
+            local contents = game:HttpGet('https://raw.githubusercontent.com/endmylifehahahahahahahahaha/vapevoidware/main/CustomModules/'..RenderFunctions:GithubHash()..v)
             if contents ~= '404: Not Found' then 
                 contents = (tostring(contents:split('\n')[1]):find('Voidware Custom Vape Signed File') and contents or '-- Voidware Custom Vape Signed File\n'..contents)
                 if isfolder('vape') then 
